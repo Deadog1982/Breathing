@@ -26,10 +26,12 @@ export const Session: React.FC = () => {
     return () => clearInterval(t);
   }, [isPaused]);
 
-  const playSound = useCallback((type: 'inhale' | 'exhale' | 'chime') => {
+  const playSound = useCallback((type: 'inhale' | 'exhale' | 'chime' | 'extended_exhale' | 'extended_inhale') => {
     if (type === 'inhale') audio.playInhale(config.pace / 2000);
     if (type === 'exhale') audio.playExhale(config.pace / 2000);
     if (type === 'chime') audio.playChime();
+    if (type === 'extended_exhale') audio.playExhale(4);
+    if (type === 'extended_inhale') audio.playInhale(4);
   }, [config.pace]);
 
   useEffect(() => {
@@ -61,6 +63,7 @@ export const Session: React.FC = () => {
             playSound('inhale');
           } else {
             playSound('chime');
+            playSound('extended_exhale');
             setPhase('retention');
             setTimeLeft(config.baseHoldTime + (round - 1) * config.holdIncrement);
           }
@@ -72,6 +75,7 @@ export const Session: React.FC = () => {
         timeoutId = window.setTimeout(() => setTimeLeft(t => t - 1), 1000);
       } else {
         playSound('chime');
+        playSound('extended_inhale');
         setPhase('recovery_inhale');
         setTimeLeft(2);
       }
@@ -89,6 +93,7 @@ export const Session: React.FC = () => {
         timeoutId = window.setTimeout(() => setTimeLeft(t => t - 1), 1000);
       } else {
         playSound('chime');
+        playSound('extended_exhale');
         setPhase('recovery_exhale');
         setTimeLeft(2);
       }
@@ -130,10 +135,12 @@ export const Session: React.FC = () => {
   const skipPhase = () => {
     if (phase === 'retention') {
       playSound('chime');
+      playSound('extended_inhale');
       setPhase('recovery_inhale');
       setTimeLeft(2);
     } else if (phase === 'recovery_hold') {
       playSound('chime');
+      playSound('extended_exhale');
       setPhase('recovery_exhale');
       setTimeLeft(2);
     }
